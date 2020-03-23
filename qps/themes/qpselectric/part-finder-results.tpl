@@ -161,6 +161,9 @@
                                         {l s="Buy this"}
 
                                     </a>
+								{else}
+
+                                    <span class="badge badge-danger" style="background: #d50000;">{l s='Not available'}</span>
 
                                 {/if}
 
