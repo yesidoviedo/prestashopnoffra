@@ -113,7 +113,7 @@ elseif (isset($_POST['eliminar_promocion_global'])){
         mysqli_query($conn, $mysql_insert) or die("database error:". mysqli_error($conn));
         while(($emp_record = fgetcsv($csv_file)) !== FALSE){
             $mysql_insert = "INSERT INTO dev_product_on_sale (id_category)
-                                                      VALUES('$emp_record[0]')";
+                                                      VALUES('".$emp_record[0]."')";
             mysqli_query($conn, $mysql_insert) or die("database error:". mysqli_error($conn));
         }
         $mysql_sp = "call eliminarPromocion";
