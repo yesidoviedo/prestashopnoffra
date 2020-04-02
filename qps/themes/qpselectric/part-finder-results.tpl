@@ -156,17 +156,16 @@
 
                                 {if $product.active}
 
-                                    <a href="index.php?controller=product&id_product={$product.id_product}&search_query={$reference} "class="btn btn-sm btn-block btn-success">
-
-                                        {l s="Buy this"}
-
-                                    </a>
+										<a href="index.php?controller=product&id_product={$product.id_product}&search_query={$reference} "class="btn btn-sm btn-block btn-success">
+                                        	{l s="Buy this"}
+                                
+								    	</a>
 								{else}
 
                                     <span class="badge badge-danger" style="background: #d50000;">{l s='Not available'}</span>
-
-                                {/if}
-
+                                
+								{/if}
+									{$product.quantity}
 							</td>
 
 						</tr>
