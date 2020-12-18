@@ -413,4 +413,19 @@ class SupplierCore extends ObjectModel
             return $res[0];
         }
     }
+
+    public static function getdistribuidor($id_supplier)
+    {
+            $cache_distribuidor = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT `distribuidor` FROM `'._DB_PREFIX_.'supplier` WHERE `id_supplier` = '.(int)$id_supplier);
+            return $cache_distribuidor;
+    }
+
+    public static function isprocesocobro($id_supplier)
+    {
+            $cache_procesocobro = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT `proceso_cobro` FROM `'._DB_PREFIX_.'supplier` WHERE `id_supplier` = '.(int)$id_supplier);
+            return $cache_procesocobro;
+
+    }
 }
