@@ -149,7 +149,7 @@ class mastersavvypayment extends PaymentModule {
     private function callPaymentButton($post_values) {
 
         if (Configuration::get('MS_TESTING_MODE') == 1) {
-            $post_url = "https://totalpos.123pago.net/msBotonDePago/index.jsp";
+            $post_url = "https://sandbox.123pago.net/msBotonDePago/index.jsp";
         } else if (Configuration::get('MS_TESTING_MODE') == 2) {
             $post_url = "https://sandbox.123pago.net/msBotonDePago/index.jsp";
         } 
@@ -210,14 +210,16 @@ class mastersavvypayment extends PaymentModule {
         $billing_address = new Address($cart->id_address_invoice);
         $proveedor    = new customer($cart->id_customer);
         $dni          = $proveedor->dni_ci;
+       
+      
+       // var_dump($dni);
+        //die();
 
-      //  $dni = $billing_address->dni;
-
-
-
-        
+       // $dni = $billing_address->dni;
         $phone = $billing_address->phone_mobile;
-
+        
+        if ($cart_details['total_proveedor']!=0)
+        {
         $post_values = array(
             "nbproveedor" => Configuration::get('MS_NB_PROVEEDOR'),
             "nb" => Tools::safeOutput(($cookie->logged ? $cookie->customer_firstname : '')),
@@ -227,13 +229,13 @@ class mastersavvypayment extends PaymentModule {
             "cs" => Configuration::get('MS_API_KEY'),
             "co" => Configuration::get('PS_SHOP_NAME') . ', pedido #' . $cart->id,
             "tl" => $phone,
-            "mt" => $cart_details['total_price'],
+            "mt" => $cart_details['total_proveedor'],
             "nai" => $cart->id,
             "ip" => $_SERVER["REMOTE_ADDR"],
             // "ancho" => Configuration::get('MS_WIDTH'),
             "ancho" => "220px"
         );
-
+        
         $cookie->nai = $cart->id;
         $cookie->write();
 
@@ -247,6 +249,7 @@ class mastersavvypayment extends PaymentModule {
         ));
 
         return $this->display(__FILE__, 'payment.tpl');
+        }
     }
 
     public function hookPaymentReturn($params) {
@@ -423,7 +426,7 @@ class mastersavvypayment extends PaymentModule {
         
         if (Configuration::get('MS_TESTING_MODE') == 1) {
             // Produccion
-            $mastersavvy = new nusoap_client('https://totalpos.123pago.net/ms_comprobar/comprobarPedido?WSDL', 'wsdl', NUSOAP_HOST, NUSOAP_PORT, NUSOAP_USERNAME, NUSOAP_PASSWORD);
+            $mastersavvy = new nusoap_client('https://123pago.net/ms_comprobar/comprobarPedido?WSDL', 'wsdl', NUSOAP_HOST, NUSOAP_PORT, NUSOAP_USERNAME, NUSOAP_PASSWORD);
         } else if (Configuration::get('MS_TESTING_MODE') == 2) {
             // Pre Produccion
             $mastersavvy = new nusoap_client('http://190.153.48.117/ms_comprobar/comprobarPedido?WSDL', 'wsdl', NUSOAP_HOST, NUSOAP_PORT, NUSOAP_USERNAME, NUSOAP_PASSWORD);
