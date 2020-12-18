@@ -75,6 +75,21 @@ class CashOnDeliveryOverride extends PaymentModule
 
 	public function hookPayment($params)
 	{
+		$products_cart = $this->context->cart->getProducts();
+        $i        = 0;
+        $mostrar  = "NO";
+		foreach ($products_cart as $key => $value) {
+			$procesocobro = Supplier::isprocesocobro($products_cart[$i]['id_supplier']);			
+			$i++;
+			if ($procesocobro == '1'){
+				$mostrar = "SI";
+			}
+		}
+		if ($mostrar == "NO"){
+			return;
+		}
+
+
 		if (!$this->active)
 			return ;
 
