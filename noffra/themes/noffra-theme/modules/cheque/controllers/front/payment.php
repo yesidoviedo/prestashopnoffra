@@ -47,7 +47,7 @@ class ChequePaymentModuleFrontController extends ModuleFrontController
 			'nbProducts' => $cart->nbProducts(),
 			'cust_currency' => $cart->id_currency,
 			'currencies' => $this->module->getCurrency((int)$cart->id_currency),
-			'total' => $cart->getOrderTotal(true, Cart::BOTH),
+			'total' => $cart->getOrderTotalTotal(true, Cart::BOTH, null, null, true, 1),
 			'isoCode' => $this->context->language->iso_code,
 			'chequeName' => $this->module->chequeName,
 			'chequeAddress' => Tools::nl2br($this->module->address),
