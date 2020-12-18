@@ -97,23 +97,24 @@
                             <tbody>
                                 <tr>
                                     <td>{l s='Total (tax excl.)' mod='bankwire'}</td>
-                                    <td class="text-right">{displayPrice price=$cartTotal.total_price_without_tax}</td>
+                                    <!--td class="text-right">{displayPrice price=$cartTotal.total_price_without_tax}</td-->
+                                    <td class="text-right">{displayPrice price=$cartTotal.total_proveedor}</td>
                                 </tr>
                                 <!--tr class="info">
                                     <td class="info">{l s='5% discount' mod='bankwire'}</td>
                                     <td class="info text-right">{displayPrice price=$cartTotal.total_price_without_tax*$discount_rate*-1}</td>
                                 </tr-->
-                                <tr>
+                                <!--tr>
                                     <td>{l s='Tax' mod='bankwire'}</td>
                                     <td class="text-right">{displayPrice price=$cartTotal.total_tax-($cartTotal.total_tax*$discount_rate)}</td>
-                                </tr>
+                                </tr-->
                             </tbody>
-                            <tfoot>
+                            <!--tfoot>
                                 <tr class="active">
                                     <th>{l s='Total' mod='bankwire'}</th>
-                                    <th class="text-right">{displayPrice price=$cartTotal.total_price-($cartTotal.total_price*$discount_rate)}</th>
+                                    <th class="text-right">{displayPrice price=$cartTotal.total_proveedor-($cartTotal.total_price*$discount_rate)}</th>
                                 </tr>
-                            </tfoot>
+                            </tfoot-->
                         </table>
                         <!-- TABLA SIN DESCUENTO -->
                         <table class="table table-condensed hidden" id="sin-descuento">
@@ -138,18 +139,18 @@
                 </div>
             </div> <!-- .row -->
             <div class="row">
-                <div class="col-xs-12">
-                    <div class="well">
+                <!--div class="col-xs-12">
+                    <div class="well"-->
                         <!-- CONTRIBUYENTE ESPECIAL -->
                         <!--<label class="checkbox">
                             <input type="checkbox" class="form-control " name="contribuyente" id="contribuyente" value="contribuyente" class="nothanks">{l s='Soy contribuyente especial' mod='bankwire'}
                         </label><br/>-->
                         <!-- NO DESCUENTO -->
-                        <label class="checkbox">
+                        <!--label class="checkbox">
                             <input type="checkbox" class="form-control " name="nothanks" id="nothanks" value="nothanks" class="nothanks">{l s='No deseo el descuento adicional' mod='bankwire'}
-                        </label>
-                    </div>
-                </div>
+                        </label-->
+                    <!--/div>
+                </div-->
                 <div class="col-xs-12">
                     <table id="transacciones" class="table table-hover table-responsive">
                         <thead>
@@ -201,7 +202,6 @@
             </button>
         </p>
     </form>
-
 	<script>
         $(document).ready(function() {
             var i = 0;
