@@ -2,11 +2,11 @@
 class Order extends OrderCore
 {
 
+    public $id_supplier;
+    public $address_ip;
+    public $user_agent;
 
-public $address_ip;
-public $user_agent;
-
-/**
+    /**
      * @see ObjectModel::$definition
      */
     public static $definition = array(
@@ -23,6 +23,7 @@ public $user_agent;
             'id_customer' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_carrier' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'current_state' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'id_supplier' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'secure_key' =>                array('type' => self::TYPE_STRING, 'validate' => 'isMd5'),
             'payment' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true),
             'module' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isModuleName', 'required' => true),
@@ -64,16 +65,80 @@ public $user_agent;
     );
 	
 
-		public function getUserIpAddr(){
-		    if(!empty($_SERVER['HTTP_CLIENT_IP'])){
-		        //ip from share internet
-		        $ip = $_SERVER['HTTP_CLIENT_IP'];
-		    }elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
-		        //ip pass from proxy
-		        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		    }else{
-		        $ip = $_SERVER['REMOTE_ADDR'];
-		    }
-		    return $ip;
+	public function getUserIpAddr(){
+		if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+		    //ip from share internet
+		    $ip = $_SERVER['HTTP_CLIENT_IP'];
+		}elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+		    //ip pass from proxy
+		    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}else{
+		    $ip = $_SERVER['REMOTE_ADDR'];
 		}
+		return $ip;
+    }
+        
+    public function getEmailSupplier($proveedor){
+        $sql = 'SELECT p.`email` FROM `'._DB_PREFIX_.'supplier` AS p
+                        WHERE p.`id_supplier` = '. $proveedor ;
+        $supplier_ids = array();
+        foreach (Db::getInstance()->executeS($sql) as $row) {
+                $supplier_ids[] = $row['email'];
+        }
+        return $supplier_ids;
+    }
+
+    public static function getCustomerOrders($id_customer, $show_hidden_status = false, Context $context = null)
+    {
+        if (!$context) {
+            $context = Context::getContext();
+        }
+
+        $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+        SELECT o.*, s.name, s.id_supplier, (SELECT SUM(od.`product_quantity`) FROM `'._DB_PREFIX_.'order_detail` od WHERE od.`id_order` = o.`id_order`) nb_products
+        FROM `'._DB_PREFIX_.'orders` o
+        LEFT JOIN `'._DB_PREFIX_.'supplier` s ON (s.`id_supplier` = o.`id_supplier`)
+        WHERE o.`id_customer` = '.(int)$id_customer.
+        Shop::addSqlRestriction(Shop::SHARE_ORDER).'
+        GROUP BY o.`id_order`
+        ORDER BY o.`date_add` DESC');
+        if (!$res) {
+            return array();
+        }
+
+        foreach ($res as $key => $val) {
+            $res2 = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+				SELECT os.`id_order_state`, osl.`name` AS order_state, os.`invoice`, os.`color` as order_state_color
+				FROM `'._DB_PREFIX_.'order_history` oh
+				LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = oh.`id_order_state`)
+				INNER JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int)$context->language->id.')
+			WHERE oh.`id_order` = '.(int)$val['id_order'].(!$show_hidden_status ? ' AND os.`hidden` != 1' : '').'
+				ORDER BY oh.`date_add` DESC, oh.`id_order_history` DESC
+			LIMIT 1');
+
+            if ($res2) {
+                $res[$key] = array_merge($res[$key], $res2[0]);
+            }
+        }
+        return $res;
+    }
+
+    public function getOrdersTotalTotalPaid()
+    {
+        return Db::getInstance()->getValue('
+            SELECT SUM(total_paid_tax_incl)
+            FROM `'._DB_PREFIX_.'orders`
+            WHERE `reference` = \''.pSQL($this->reference).'\'
+            AND `id_cart` = '.(int)$this->id_cart.
+          ' AND `id_supplier` IN (SELECT id_supplier FROM nffr_supplier where proceso_cobro=1 )');
+    }
+
+   /* public function getOrdersTotalTotalPaid()
+    {
+        return Db::getInstance()->getValue('
+            SELECT SUM(id_supplier)
+            FROM `'._DB_PREFIX_.'orders`
+            WHERE `reference` = \''.pSQL($this->reference).'\'
+            AND `id_cart` = '.(int)$this->id_cart);
+    }*/ 
 }
