@@ -24,7 +24,6 @@
 *}
 
 {capture name=path}{l s='Shipping' mod='cashondelivery'}{/capture}
-
 <h1 class="page-heading">{l s='Order summary' mod='cashondelivery'}</h1>
 
 {assign var='current_step' value='payment'}
