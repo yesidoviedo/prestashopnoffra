@@ -113,7 +113,7 @@ class OrderConfirmationControllerCore extends FrontController
             $currency = new Currency($order->id_currency);
 
             if (Validate::isLoadedObject($order)) {
-                $params['total_to_pay'] = $order->getOrdersTotalPaid();
+                $params['total_to_pay'] = $order->getOrdersTotalTotalPaid();
                 $params['currency'] = $currency->sign;
                 $params['objOrder'] = $order;
                 $params['currencyObj'] = $currency;
