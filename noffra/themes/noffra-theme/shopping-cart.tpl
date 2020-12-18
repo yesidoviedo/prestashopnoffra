@@ -44,6 +44,64 @@
 	</p>
 {/if}
 
+<div style="text-align:center;">
+		{assign var=suppliers value= $cart->getSupplier()}
+		<table class="table table-bordered">
+			<tr> 
+				<td colspan=3 style="text-align: center ; margin-bottom: 5px; font-size: 30px ">Total Pedidos por Proveedor
+				</td>
+			</tr>
+			{foreach $suppliers as $supplier}
+				{if $supplier.mensaje1 && $supplier.mensaje2 && $supplier.mensaje3}
+					<tr class="cart_avail item text-center">					
+						<td rowspan="4" class="cart_description"><h4>{$supplier['name']}</h4></td>
+						<td rowspan="4" class="cart_unit" data-title="Unit price"><ul class="price text-right"><li class="cart_total_price"><h4>$ {number_format($cart->getOrderTotalProveedor(true, Cart::BOTH, null, null, true, $supplier.id_supplier),2,",", ".")}</h4></li></ul></td>
+					</tr>
+
+					<tr>
+						<td class="cart_description" style="text-align: center; width:70%; margin-bottom: 5px;">{$supplier.mensaje1}</td>
+					</tr>
+					<tr>
+						<td class="cart_description" style="text-align: center; width:70%; margin-bottom: 5px;">{$supplier.mensaje2}</td>
+					</tr>
+					<tr>
+						<td class="cart_description" style="text-align: center; width:70%; margin-bottom: 5px;">{$supplier.mensaje3}</td>
+					</tr>
+				{elseif $supplier.mensaje1 && $supplier.mensaje2}
+					<tr class="cart_avail item text-center">					
+						<td rowspan="3" class="cart_description"><h4>{$supplier['name']}</h4></td>
+						<td rowspan="3" class="cart_unit" data-title="Unit price"><ul class="price text-right"><li class="cart_total_price"><h4>$ {number_format($cart->getOrderTotalProveedor(true, Cart::BOTH, null, null, true, $supplier.id_supplier),2,",", ".")}</h4></li></ul></td>
+					</tr>
+
+					<tr>
+						<td class="cart_description" style="text-align: center; width:70%; margin-bottom: 5px;">{$supplier.mensaje1}</td>
+					</tr>
+					<tr>
+						<td class="cart_description" style="text-align: center; width:70%; margin-bottom: 5px;">{$supplier.mensaje2}</td>
+					</tr>
+				{elseif $supplier.mensaje1}
+					<tr class="cart_avail item text-center">					
+						<td rowspan="2" class="cart_description"><h4>{$supplier['name']}</h4></td>
+						<td rowspan="2" class="cart_unit" data-title="Unit price"><ul class="price text-right"><li class="cart_total_price"><h4>$ {number_format($cart->getOrderTotalProveedor(true, Cart::BOTH, null, null, true, $supplier.id_supplier),2,",", ".")}</h4></li></ul></td>
+					</tr>
+
+					<tr>
+						<td class="cart_description" style="text-align: center; width:70%; margin-bottom: 5px;">{$supplier.mensaje1}</td>
+					</tr>
+				{else}
+					<tr class="cart_avail item text-center">					
+						<td rowspan="2" class="cart_description"><h4>{$supplier['name']}</h4></td>
+						<td rowspan="2" class="cart_unit" data-title="Unit price"><ul class="price text-right"><li class="cart_total_price"><h4>$ {number_format($cart->getOrderTotalProveedor(true, Cart::BOTH, null, null, true, $supplier.id_supplier),2,",", ".")}</h4></li></ul></td>
+					</tr>
+					<tr>
+						<td class="cart_description" style="text-align: center; width:70%"><p>{$supplier.mensaje1}</p></td>
+					</tr>
+				{/if}
+			{/foreach}
+		</table>
+</div>
+
+
 {assign var='current_step' value='summary'}
 {include file="$tpl_dir./order-steps.tpl"}
 {include file="$tpl_dir./errors.tpl"}
@@ -99,6 +157,7 @@
 					<th class="cart_quantity item text-center">{l s='Qty'}</th>
 					<th class="cart_delete last_item">&nbsp;</th>
 					<th class="cart_total item text-right">{l s='Total'}</th>
+					<th class="cart_unit item text-center">{l s='Proveedor'}</th>
 				</tr>
 			</thead>
 			<tfoot>
@@ -129,7 +188,7 @@
 				{if $use_taxes}
 					{if $priceDisplay}
 						<tr class="cart_total_price">
-							<td rowspan="{$rowspan_total}" colspan="3" id="cart_voucher" class="cart_voucher">
+							<td rowspan="{$rowspan_total}" colspan="2" id="cart_voucher" class="cart_voucher">
 								{if $voucherAllowed}
 									<form action="{if $opc}{$link->getPageLink('order-opc', true)}{else}{$link->getPageLink('order', true)}{/if}" method="post" id="voucher">
 										<fieldset>
@@ -299,14 +358,17 @@
 						<td colspan="2" class="price" id="total_price_container">
 							<span id="total_price">{displayPrice price=$total_price_without_tax}</span>
 						</td>
+						<td></td>
 					{/if}
 				</tr>
 			</tfoot>
 			<tbody>
+
 				{assign var='odd' value=0}
 				{assign var='have_non_virtual_products' value=false}
 
                 {*Productos precio neto*}
+				
 				{foreach $products as $product}
 					{if $product.is_virtual == 0}
 						{assign var='have_non_virtual_products' value=true}
@@ -437,7 +499,6 @@
 							<tr
 									id="product_{$product.id_product}_{$product.id_product_attribute}_{$id_customization}_{$product.id_address_delivery|intval}"
 									class="product_customization_for_{$product.id_product}_{$product.id_product_attribute}_{$product.id_address_delivery|intval}{if $odd} odd{else} even{/if} customization alternate_item {if $product@last && $customization@last && !count($gift_products)}last_item{/if}">
-								<td></td>
 								<td colspan="3">
                                     {foreach $customization.datas as $type => $custom_data}
                                         {if $type == $CUSTOMIZE_FILE}
@@ -558,6 +619,8 @@
                     {/if}
                 {/foreach}
 
+
+
 			</tbody>
 
 			{if sizeof($discounts)}
@@ -589,10 +652,13 @@
 							</td>
 						</tr>
 					{/foreach}
+
 				</tbody>
 			{/if}
 		</table>
 	</div> <!-- end order-detail-content -->
+
+
 
 	{if $show_option_allow_separate_package}
 	<p>
@@ -605,6 +671,8 @@
 
 	{* Define the style if it doesn't exist in the PrestaShop version*}
 	{* Will be deleted for 1.5 version and more *}
+
+	
 	{if !isset($addresses_style)}
 		{$addresses_style.company = 'address_company'}
 		{$addresses_style.vat_number = 'address_company'}
@@ -634,9 +702,11 @@
 						</ul>
 					</div>
 				{/if}
+
 				{if $invoice->id}
 					<div class="col-xs-12 col-sm-6">
 						<ul id="invoice_address" class="address alternate_item box">
+
 							<li><h3 class="page-subheading">{l s='Invoice address'}&nbsp;<span class="address_alias">({$invoice->alias})</span></h3></li>
 							{if $invoice->company}<li class="address_company">{$invoice->company|escape:'html':'UTF-8'}</li>{/if}
 							<li class="address_name">{$invoice->firstname|escape:'html':'UTF-8'} {$invoice->lastname|escape:'html':'UTF-8'}</li>
@@ -686,6 +756,7 @@
 			{/if}
 		</div>
 	{/if}
+
 	<div id="HOOK_SHOPPING_CART">{$HOOK_SHOPPING_CART}</div>
 	<p class="cart_navigation clearfix">
 		{if !$opc}
@@ -702,9 +773,9 @@
 		</a>
 	</p>
 	<div class="clear"></div>
-	<div class="cart_navigation_extra">
+	<!--div class="cart_navigation_extra">
 		<div id="HOOK_SHOPPING_CART_EXTRA">{if isset($HOOK_SHOPPING_CART_EXTRA)}{$HOOK_SHOPPING_CART_EXTRA}{/if}</div>
-	</div>
+	</div-->
 {strip}
 {addJsDef deliveryAddress=$cart->id_address_delivery|intval}
 {addJsDefL name=txtProduct}{l s='product' js=1}{/addJsDefL}
